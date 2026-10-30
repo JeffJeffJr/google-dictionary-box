@@ -5,8 +5,8 @@ Brings the old pre-AI Google dictionary card back.
 ## Install (Chromium)
 1. Download the zip for the languages you want from the GitHub release.
 2. Unzip it.
-3. Go to `chrome://extensions` (Edge: `edge://extensions`).
-4. Turn on **Developer mode** (top right).
+3. Open your browser's extensions page (e.g. `chrome://extensions`, `edge://extensions`, `brave://extensions`).
+4. Turn on **Developer mode**.
 5. Click **Load unpacked** and pick the unzipped `dictionary-box-…` folder.
 
 ## How it works
