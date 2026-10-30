@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Dictionary Box for Google",
   "version": "1.6.0",
-  "description": "Brings the old pre-AI Google dictionary card back.",
+  "description": "Brings the old pre-AI Google dictionary box back.",
   "permissions": [
     "storage",
     "scripting"

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <!-- A miniature dictionary card: headword, speaker, two definition lines. Used for the 48 and 128 px icons. -->
+  <!-- A miniature dictionary box: headword, speaker, two definition lines. Used for the 48 and 128 px icons. -->
   <rect x="8" y="16" width="112" height="96" rx="16" fill="#ffffff" stroke="#5f6368" stroke-width="5"/>
   <rect x="26" y="34" width="46" height="15" rx="7.5" fill="#202124"/>
   <path d="M80 37.5h6.5l8.5-7.5v24l-8.5-7.5H80z" fill="#1a73e8"/>

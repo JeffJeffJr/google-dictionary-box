@@ -1,6 +1,6 @@
 # Dictionary Box for Google
 
-Brings the old pre-AI Google dictionary card back.
+Brings the old pre-AI Google dictionary box back.
 
 Note: Depends on undocumented Google behavior, might break anytime.
 
