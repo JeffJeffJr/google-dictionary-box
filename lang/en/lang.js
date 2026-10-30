@@ -1,4 +1,4 @@
-// English: "serendipity meaning", "define serendipity", plain "serendipity", checked against the
+// English: "sunder meaning", "define sunder", plain "sunder", checked against the
 // bundled word list (wordfilter.js, built from words.txt).
 //
 // A language entry has:
@@ -49,13 +49,13 @@ LANGS.push(
       );
     }
 
-    // Latin letters only, so a user trigger like "意思" leaves "偶然 意思" to Chinese.
+    // Latin letters only, so a user trigger like "意思" leaves "分离 意思" to Chinese.
     const latin = (w) => (w && !/[^\P{L}\p{Script=Latin}]/u.test(w) ? w : null);
 
     return {
       id: "en",
       name: "English",
-      hint: "“serendipity meaning”, “define serendipity”, “what does serendipity mean”. Only for words in the built-in English word list.",
+      hint: "“sunder meaning”, “define sunder”, “what does sunder mean”. Only for words in the built-in English word list.",
       match: (q, settings) => latin(parseQuery(q, settings.triggers)),
       bare: (q) => latin(bareWord(q)),
       isReal: isRealPhrase,

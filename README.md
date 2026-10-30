@@ -12,6 +12,6 @@ Brings the old pre-AI Google dictionary card back.
 ## How it works
 Adds `&tbs=1` to the URL, which brings back Google's Oxford dictionary box. This happens when you search
 with a trigger word like "meaning" or "definition", or search a single word on its own (English words
-from the built-in word list only). Chinese works with searches like `偶然的意思`.
+from the built-in word list only). Chinese works with searches like `分离的意思`.
 
 If Google has no box for the word, the search reloads normally so the AI Overview explains it.

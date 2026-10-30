@@ -61,7 +61,7 @@ function parseQuery(q, triggers = DEFAULTS.triggers) {
   return null;
 }
 
-// A plain one-word search like "serendipity" (setting bareWords; languages opt in with `bare`).
+// A plain one-word search like "sunder" (setting bareWords; languages opt in with `bare`).
 // Google decides whether its box shows for it ("pizza" gets none, and its normal page comes back).
 function bareWord(q) {
   const w = cleanWord(q);
@@ -76,8 +76,8 @@ const LANGS = [];
 
 const activeLangs = (settings) => LANGS.filter((l) => !(settings.disabledLangs || []).includes(l.id));
 
-// Which search to act on: a definition search in any active language ("serendipity meaning",
-// "偶然的意思"), or with bareWords on, a plain one-word search outside AI Mode.
+// Which search to act on: a definition search in any active language ("sunder meaning",
+// "分离的意思"), or with bareWords on, a plain one-word search outside AI Mode.
 // Returns { word, bare, lang } or null.
 function matchQuery(params, settings) {
   const q = params.get("q");

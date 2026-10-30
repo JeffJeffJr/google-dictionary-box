@@ -1,5 +1,5 @@
 // Shows how searches would be matched, using query.js and every language's content scripts (languages.js).
-//   node tools/try.js "serendipity meaning" "偶然的意思" "pizza"
+//   node tools/try.js "sunder meaning" "分离的意思" "pizza"
 // Exports load() for tests: a vm context with LANGS, matchQuery, isRealMatch, DEFAULTS, ...
 const fs = require("fs");
 const path = require("path");
