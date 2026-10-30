@@ -15,7 +15,7 @@ function loadScript(src) {
   });
 }
 
-// One checkbox per language, each with its own hint.
+// One checkbox per language; its hint shows on hover.
 function renderLangs() {
   for (const lang of LANGS) {
     const input = document.createElement("input");
@@ -25,10 +25,10 @@ function renderLangs() {
     hint.className = "hint";
     hint.textContent = lang.hint;
     const text = document.createElement("span");
-    text.append(lang.name, document.createElement("br"), hint);
+    text.textContent = lang.name;
     const row = document.createElement("label");
-    row.className = "row";
-    row.append(input, text);
+    row.className = "row tip";
+    row.append(input, text, hint);
     $("langs").appendChild(row);
   }
   // Plain one-word searches only exist for languages with a word list (English).

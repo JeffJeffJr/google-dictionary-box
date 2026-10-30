@@ -4,15 +4,24 @@
   <meta charset="utf-8">
   <title>Dictionary Box settings</title>
   <style>
-    :root { color-scheme: light dark; --fg:#202124; --muted:#5f6368; --line:#dadce0; --bg:#fff; --accent:#1a73e8; }
-    @media (prefers-color-scheme: dark) { :root { --fg:#e8eaed; --muted:#9aa0a6; --line:#3c4043; --bg:#202124; --accent:#8ab4f8; } }
-    body { font: 14px/1.5 arial, sans-serif; color: var(--fg); background: var(--bg); margin: 0; padding: 18px 20px; min-width: 320px; max-width: 520px; }
+    :root { color-scheme: light dark; --fg:#202124; --muted:#5f6368; --line:#dadce0; --bg:#fff; --accent:#1a73e8; --tip-bg:#3c4043; --tip-fg:#fff; }
+    @media (prefers-color-scheme: dark) { :root { --fg:#e8eaed; --muted:#9aa0a6; --line:#3c4043; --bg:#202124; --accent:#8ab4f8; --tip-bg:#e8eaed; --tip-fg:#202124; } }
+    body { font: 14px/1.5 arial, sans-serif; color: var(--fg); background: var(--bg); margin: 0; padding: 16px 18px; min-width: 300px; max-width: 520px; }
     h1 { font: 400 20px "Google Sans", arial, sans-serif; margin: 0 0 14px; }
-    label.row { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 14px; cursor: pointer; }
+    label.row { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 10px; cursor: pointer; }
     label.row input { margin-top: 3px; accent-color: var(--accent); }
-    #langs { margin: -4px 0 14px 24px; }
+    #langs { margin: -2px 0 10px 24px; }
     [hidden] { display: none !important; }
-    .hint { color: var(--muted); font-size: 12.5px; }
+    /* Details show in a bubble under a setting while it's hovered or focused, after a short pause. */
+    .tip { position: relative; }
+    .hint {
+      position: absolute; left: 24px; right: 0; top: calc(100% + 2px); z-index: 1;
+      background: var(--tip-bg); color: var(--tip-fg); font-size: 12.5px; line-height: 1.45;
+      padding: 7px 10px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+      opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .12s, visibility .12s;
+    }
+    .tip:hover > .hint, .tip:focus-within > .hint { opacity: 1; visibility: visible; transition-delay: .4s; }
+    .field .hint { left: 0; }
     textarea { width: 100%; box-sizing: border-box; min-height: 64px; font: 13px/1.4 monospace; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: var(--fg); resize: vertical; }
     .actions { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
     button { font: 14px arial, sans-serif; border: 0; border-radius: 18px; padding: 7px 18px; background: var(--accent); color: #fff; cursor: pointer; }
@@ -24,27 +33,26 @@
 <body>
   <h1>Dictionary Box</h1>
 
-  <label class="row"><input type="checkbox" id="enabled">
-    <span>Turn on<br><span class="hint">Brings back Google's dictionary box on definition searches in the languages below.</span></span>
+  <label class="row tip"><input type="checkbox" id="enabled">
+    <span>Turn on</span><span class="hint">Brings back Google's dictionary box on definition searches in the languages below.</span>
   </label>
 
   <div id="langs"></div>
 
-  <label class="row"><input type="checkbox" id="useGoogleBox">
-    <span>Use Google's own dictionary box when it's available<br><span class="hint">Adds &amp;tbs=1 to definition searches, which brings back Google's Oxford Languages box and removes the AI Overview. If Google has no box for a word, the search reloads with the AI Overview instead, and this extension's box is used only if there's no AI Overview either.</span></span>
+  <label class="row tip"><input type="checkbox" id="useGoogleBox">
+    <span>Use Google's dictionary box</span><span class="hint">Adds &amp;tbs=1 to definition searches, which brings back Google's Oxford Languages box and removes the AI Overview. If Google has no box for a word, the search reloads with the AI Overview instead, and this extension's box is used only if there's no AI Overview either.</span>
   </label>
 
-  <label class="row" id="bareRow"><input type="checkbox" id="bareWords">
-    <span>Also on plain one-word searches<br><span class="hint">Searching just “serendipity” brings up Google's dictionary box too, no “meaning” needed. Only for words in the built-in English word list, and only when Google has a box for it.</span></span>
+  <label class="row tip" id="bareRow"><input type="checkbox" id="bareWords">
+    <span>Also on plain one-word searches</span><span class="hint">Searching just “serendipity” brings up Google's dictionary box too, no “meaning” needed. Only for words in the built-in English word list, and only when Google has a box for it.</span>
   </label>
 
-  <label class="row"><input type="checkbox" id="hideAiOverview">
-    <span>Hide the AI Overview on those searches<br><span class="hint">Only on definition searches. Also hides the “AI Mode” tab link there.</span></span>
+  <label class="row tip"><input type="checkbox" id="hideAiOverview">
+    <span>Hide the AI Overview</span><span class="hint">Only on definition searches. Also hides the “AI Mode” tab link there.</span>
   </label>
 
-  <div>
-    <div>Trigger words</div>
-    <div class="hint" style="margin-bottom:6px">Comma-separated. Works before or after the word (e.g. “meaning X” or “X meaning”).</div>
+  <div class="field">
+    <div class="tip" style="margin-bottom:6px"><label for="triggers">Trigger words</label><span class="hint">Comma-separated. Works before or after the word (e.g. “meaning X” or “X meaning”).</span></div>
     <textarea id="triggers" spellcheck="false"></textarea>
   </div>
 
