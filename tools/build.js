@@ -1,0 +1,139 @@
+// Builds the downloads: one zip per language plus one with every language, for a GitHub release.
+// Also rewrites the root manifest.json for every language, so this folder loads unpacked as-is.
+//   node tools/build.js            -> dist/dictionary-box-all.zip, dist/dictionary-box-<id>.zip for each language
+//   node tools/build.js en,zh      -> just that combination (dist/dictionary-box-en-zh.zip)
+// Each language is a folder lang/<id>/ with a pack.json:
+//   content  files loaded as content scripts, in order (lang.js last; it registers the language)
+//   hosts    host permissions its card lookup (lookup.js) needs
+//   google   Google domains to run on (google.<tld>); a download runs on all of its languages' domains
+//   exclude  files kept out of the download (sources, e.g. words.txt)
+// Each zip unpacks to a folder dictionary-box-<name>/ with the extension in it, ready for Load unpacked.
+const fs = require("fs");
+const path = require("path");
+const zlib = require("zlib");
+
+const root = path.join(__dirname, "..");
+const dist = path.join(root, "dist");
+const CORE = ["manifest.json", "background.js", "query.js", "page.js", "card.js", "content.js", "options.html", "options.js", "README.md"];
+
+const langIds = fs
+  .readdirSync(path.join(root, "lang"))
+  .filter((id) => fs.existsSync(path.join(root, "lang", id, "pack.json")))
+  .sort((a, b) => (a === "en" ? -1 : b === "en" ? 1 : a.localeCompare(b)));
+const packs = Object.fromEntries(
+  langIds.map((id) => [id, JSON.parse(fs.readFileSync(path.join(root, "lang", id, "pack.json"), "utf8"))])
+);
+
+const unique = (list) => [...new Set(list)];
+
+function manifestFor(ids) {
+  const m = JSON.parse(fs.readFileSync(path.join(root, "manifest.json"), "utf8"));
+  m.host_permissions = unique(ids.flatMap((id) => packs[id].hosts));
+  const cs = m.content_scripts[0];
+  cs.matches = unique(ids.flatMap((id) => packs[id].google)).map((tld) => `https://www.google.${tld}/search*`);
+  cs.js = ["query.js", ...ids.flatMap((id) => packs[id].content.map((f) => `lang/${id}/${f}`)), "page.js", "card.js", "content.js"];
+  return JSON.stringify(m, null, 2) + "\n";
+}
+
+// Every file under dir, as paths relative to root with forward slashes.
+function walk(dir) {
+  return fs.readdirSync(path.join(root, dir), { withFileTypes: true }).flatMap((e) => {
+    const rel = `${dir}/${e.name}`;
+    return e.isDirectory() ? walk(rel) : [rel];
+  });
+}
+
+// ---------- Minimal zip writer (deflate, no dependencies) ----------
+
+const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {
+  let c = n;
+  for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+  return c >>> 0;
+});
+
+function crc32(buf) {
+  let c = 0xffffffff;
+  for (const b of buf) c = CRC_TABLE[(c ^ b) & 0xff] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+function zip(entries) {
+  const locals = [];
+  const centrals = [];
+  let offset = 0;
+  for (const { name, data } of entries) {
+    const nameBuf = Buffer.from(name, "utf8");
+    const packed = zlib.deflateRawSync(data, { level: 9 });
+    const crc = crc32(data);
+    const head = Buffer.alloc(30);
+    head.writeUInt32LE(0x04034b50, 0);
+    head.writeUInt16LE(20, 4); // version needed
+    head.writeUInt16LE(0x0800, 6); // UTF-8 names
+    head.writeUInt16LE(8, 8); // deflate
+    head.writeUInt32LE(0x00210000, 10); // 1980-01-01, so builds are reproducible
+    head.writeUInt32LE(crc, 14);
+    head.writeUInt32LE(packed.length, 18);
+    head.writeUInt32LE(data.length, 22);
+    head.writeUInt16LE(nameBuf.length, 26);
+    locals.push(head, nameBuf, packed);
+
+    const central = Buffer.alloc(46);
+    central.writeUInt32LE(0x02014b50, 0);
+    central.writeUInt16LE(20, 4);
+    central.writeUInt16LE(20, 6);
+    central.writeUInt16LE(0x0800, 8);
+    central.writeUInt16LE(8, 10);
+    central.writeUInt32LE(0x00210000, 12);
+    central.writeUInt32LE(crc, 16);
+    central.writeUInt32LE(packed.length, 20);
+    central.writeUInt32LE(data.length, 24);
+    central.writeUInt16LE(nameBuf.length, 28);
+    central.writeUInt32LE(offset, 42);
+    centrals.push(central, nameBuf);
+    offset += head.length + nameBuf.length + packed.length;
+  }
+  const centralSize = centrals.reduce((n, b) => n + b.length, 0);
+  const end = Buffer.alloc(22);
+  end.writeUInt32LE(0x06054b50, 0);
+  end.writeUInt16LE(entries.length, 8);
+  end.writeUInt16LE(entries.length, 10);
+  end.writeUInt32LE(centralSize, 12);
+  end.writeUInt32LE(offset, 16);
+  return Buffer.concat([...locals, ...centrals, end]);
+}
+
+// ---------- Build ----------
+
+function build(ids) {
+  const name = ids.length === langIds.length ? "all" : ids.join("-");
+  const folder = `dictionary-box-${name}`;
+  const files = new Map(); // path in the extension -> contents
+  for (const f of CORE) files.set(f, fs.readFileSync(path.join(root, f)));
+  files.set("manifest.json", Buffer.from(manifestFor(ids)));
+  for (const f of walk("icons")) files.set(f, fs.readFileSync(path.join(root, f)));
+  for (const id of ids) {
+    const skip = new Set(["pack.json", ...packs[id].exclude].map((f) => `lang/${id}/${f}`));
+    for (const f of walk(`lang/${id}`)) if (!skip.has(f)) files.set(f, fs.readFileSync(path.join(root, f)));
+  }
+
+  // Unpacked copy (handy for testing a build) and the zip.
+  const out = path.join(dist, folder);
+  fs.rmSync(out, { recursive: true, force: true });
+  for (const [f, data] of files) {
+    fs.mkdirSync(path.dirname(path.join(out, f)), { recursive: true });
+    fs.writeFileSync(path.join(out, f), data);
+  }
+  const archive = zip([...files].map(([f, data]) => ({ name: `${folder}/${f}`, data })));
+  fs.writeFileSync(path.join(dist, `${folder}.zip`), archive);
+  console.log(`${folder}.zip  ${(archive.length / 1024).toFixed(0)} KB  (${ids.join(", ")})`);
+}
+
+const arg = process.argv[2];
+for (const id of arg ? arg.split(",") : []) {
+  if (!packs[id]) throw new Error(`unknown language "${id}" (have: ${langIds.join(", ")})`);
+}
+
+fs.writeFileSync(path.join(root, "manifest.json"), manifestFor(langIds));
+fs.mkdirSync(dist, { recursive: true });
+if (arg) build(langIds.filter((id) => arg.split(",").includes(id)));
+else [langIds, ...langIds.map((id) => [id])].forEach(build);

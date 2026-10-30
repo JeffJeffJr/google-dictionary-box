@@ -1,0 +1,6 @@
+{
+  "content": ["lang.js"],
+  "hosts": ["https://www.moedict.tw/*"],
+  "google": ["com", "com.hk", "com.tw", "com.sg", "com.my"],
+  "exclude": []
+}

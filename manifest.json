@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "Dictionary Box for Google",
+  "version": "1.5.0",
+  "description": "Brings back Google's dictionary box, instead of the AI Overview, when you search for what a word means.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://api.dictionaryapi.dev/*",
+    "https://www.moedict.tw/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.google.com/search*",
+        "https://www.google.com.my/search*",
+        "https://www.google.com.sg/search*",
+        "https://www.google.co.uk/search*",
+        "https://www.google.ca/search*",
+        "https://www.google.com.au/search*",
+        "https://www.google.co.in/search*",
+        "https://www.google.co.nz/search*",
+        "https://www.google.ie/search*",
+        "https://www.google.com.ph/search*",
+        "https://www.google.co.id/search*",
+        "https://www.google.com.hk/search*",
+        "https://www.google.com.tw/search*"
+      ],
+      "js": [
+        "query.js",
+        "lang/en/wordfilter.js",
+        "lang/en/lang.js",
+        "lang/zh/lang.js",
+        "page.js",
+        "card.js",
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "options_page": "options.html",
+  "action": {
+    "default_title": "Dictionary Box settings",
+    "default_popup": "options.html"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

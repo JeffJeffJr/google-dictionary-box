@@ -1,0 +1,6 @@
+{
+  "content": ["wordfilter.js", "lang.js"],
+  "hosts": ["https://api.dictionaryapi.dev/*"],
+  "google": ["com", "com.my", "com.sg", "co.uk", "ca", "com.au", "co.in", "co.nz", "ie", "com.ph", "co.id", "com.hk"],
+  "exclude": ["words.txt"]
+}
