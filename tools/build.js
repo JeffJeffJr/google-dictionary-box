@@ -17,7 +17,7 @@ const zlib = require("zlib");
 
 const root = path.join(__dirname, "..");
 const dist = path.join(root, "dist");
-const CORE = ["manifest.json", "background.js", "query.js", "page.js", "content.js", "options.html", "options.js", "README.md"];
+const CORE = ["manifest.json", "background.js", "query.js", "page.js", "content.js", "options.html", "options.js", "README.md", "LICENSE"];
 
 const langIds = fs
   .readdirSync(path.join(root, "lang"))

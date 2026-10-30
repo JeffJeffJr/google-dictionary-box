@@ -2,6 +2,8 @@
 
 Brings the old pre-AI Google dictionary card back.
 
+Note: Depends on undocumented Google behavior, might break anytime.
+
 ## Install (Chromium)
 1. Download the zip for the languages you want from the GitHub release.
 2. Unzip it.
