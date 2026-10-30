@@ -16,7 +16,7 @@ Google Books Ngram "use over time" chart. By default it also hides the AI Overvi
    - `dictionary-box-en.zip`: English
    - `dictionary-box-zh.zip`: Chinese (中文)
    - `dictionary-box-all.zip`: every language
-2. Unzip it somewhere permanent (don't delete it afterwards — Chrome loads it from there).
+2. Unzip it.
 3. Go to `chrome://extensions` (Edge: `edge://extensions`).
 4. Turn on **Developer mode** (top right).
 5. Click **Load unpacked** and pick the unzipped `dictionary-box-…` folder.
