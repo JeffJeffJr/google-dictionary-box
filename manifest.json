@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Dictionary Box for Google",
   "version": "1.6.0",
-  "description": "Brings back Google's dictionary box, instead of the AI Overview, when you search for what a word means.",
+  "description": "Brings the old pre-AI Google dictionary card back.",
   "permissions": [
     "storage",
     "scripting"
