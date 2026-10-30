@@ -26,6 +26,8 @@ A clone of this repository also loads unpacked as-is, with every language.
 
 Settings: click the extension's toolbar icon (pin it from the puzzle-piece menu) to switch languages on
 or off, toggle AI Overview hiding, or edit the trigger words. Only the languages in your download are listed.
+A language you switch off isn't loaded at all, so the "all" download is just as fast as a single-language
+one. You can also delete a language's `lang/<id>/` folder and reload the extension.
 
 ## Google's own box (tbs=1)
 By default, definition searches for real English words get `&tbs=1` added to the URL. Google doesn't recognise that value, so it
@@ -66,7 +68,7 @@ Each language is a folder `lang/<id>/`:
 - `lang.js`: what searches it matches, the word check, and the card's wording
 - `lookup.js` (optional): where the fallback card's definitions come from
 
-`node tools/build.js` rewrites `manifest.json` (every language) and writes `dist/dictionary-box-all.zip`
+`node tools/build.js` rewrites `manifest.json` and `languages.js` (every language) and writes `dist/dictionary-box-all.zip`
 plus one `dist/dictionary-box-<id>.zip` per language, ready to attach to a GitHub release.
 `node tools/build.js en,zh` builds just that combination. `node tools/try.js "<search>"` shows how a
 search would be matched.

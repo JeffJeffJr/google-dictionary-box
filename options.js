@@ -1,9 +1,10 @@
 // Settings popup. DEFAULTS and LANGS come from query.js; each language in this download
-// (lang/<id>/lang.js in the manifest's content scripts) is loaded here too, for its name and hint.
+// (LANGUAGE_PACKS, from languages.js) is loaded here too, for its name and hint. A language whose
+// folder was deleted fails to load and isn't listed.
 
 const $ = (id) => document.getElementById(id);
 
-const langFiles = chrome.runtime.getManifest().content_scripts[0].js.filter((f) => /^lang\/[\w-]+\/lang\.js$/.test(f));
+const langFiles = Object.keys(LANGUAGE_PACKS).map((id) => `lang/${id}/lang.js`);
 
 function loadScript(src) {
   return new Promise((resolve) => {

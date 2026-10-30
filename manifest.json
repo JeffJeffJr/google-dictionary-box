@@ -4,44 +4,29 @@
   "version": "1.5.0",
   "description": "Brings back Google's dictionary box, instead of the AI Overview, when you search for what a word means.",
   "permissions": [
-    "storage"
+    "storage",
+    "scripting"
   ],
   "host_permissions": [
+    "https://www.google.com/*",
+    "https://www.google.com.my/*",
+    "https://www.google.com.sg/*",
+    "https://www.google.co.uk/*",
+    "https://www.google.ca/*",
+    "https://www.google.com.au/*",
+    "https://www.google.co.in/*",
+    "https://www.google.co.nz/*",
+    "https://www.google.ie/*",
+    "https://www.google.com.ph/*",
+    "https://www.google.co.id/*",
+    "https://www.google.com.hk/*",
+    "https://www.google.com.tw/*",
     "https://api.dictionaryapi.dev/*",
     "https://www.moedict.tw/*"
   ],
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "https://www.google.com/search*",
-        "https://www.google.com.my/search*",
-        "https://www.google.com.sg/search*",
-        "https://www.google.co.uk/search*",
-        "https://www.google.ca/search*",
-        "https://www.google.com.au/search*",
-        "https://www.google.co.in/search*",
-        "https://www.google.co.nz/search*",
-        "https://www.google.ie/search*",
-        "https://www.google.com.ph/search*",
-        "https://www.google.co.id/search*",
-        "https://www.google.com.hk/search*",
-        "https://www.google.com.tw/search*"
-      ],
-      "js": [
-        "query.js",
-        "lang/en/wordfilter.js",
-        "lang/en/lang.js",
-        "lang/zh/lang.js",
-        "page.js",
-        "card.js",
-        "content.js"
-      ],
-      "run_at": "document_start"
-    }
-  ],
   "options_page": "options.html",
   "action": {
     "default_title": "Dictionary Box settings",

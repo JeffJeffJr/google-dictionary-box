@@ -1,4 +1,4 @@
-// Shows how searches would be matched, using query.js and every language's content scripts.
+// Shows how searches would be matched, using query.js and every language's content scripts (languages.js).
 //   node tools/try.js "serendipity meaning" "偶然的意思" "pizza"
 // Exports load() for tests: a vm context with LANGS, matchQuery, isRealMatch, DEFAULTS, ...
 const fs = require("fs");
@@ -8,9 +8,10 @@ const vm = require("vm");
 const root = path.join(__dirname, "..");
 
 function load() {
-  const files = JSON.parse(fs.readFileSync(path.join(root, "manifest.json"), "utf8")).content_scripts[0].js;
   const ctx = vm.createContext({ URL, URLSearchParams });
-  for (const f of files.filter((f) => f === "query.js" || f.startsWith("lang/"))) {
+  vm.runInContext(fs.readFileSync(path.join(root, "languages.js"), "utf8"), ctx);
+  const packs = vm.runInContext("LANGUAGE_PACKS", ctx);
+  for (const f of ["query.js", ...Object.values(packs).flatMap((p) => p.content)]) {
     vm.runInContext(fs.readFileSync(path.join(root, f), "utf8"), ctx, { filename: f });
   }
   return vm.runInContext("({ DEFAULTS, LANGS, matchQuery, isRealMatch, googleBoxUrl, parseQuery })", ctx);
