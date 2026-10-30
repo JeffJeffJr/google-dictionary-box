@@ -34,21 +34,13 @@
   <h1>Dictionary Box</h1>
 
   <label class="row tip"><input type="checkbox" id="enabled">
-    <span>Turn on</span><span class="hint">Brings back Google's dictionary box on definition searches in the languages below.</span>
+    <span>Turn on</span><span class="hint">Adds &amp;tbs=1 to definition searches in the languages below, which brings back Google's dictionary box and removes the AI Overview. If Google has no box for a word, the search reloads with the AI Overview instead.</span>
   </label>
 
   <div id="langs"></div>
 
-  <label class="row tip"><input type="checkbox" id="useGoogleBox">
-    <span>Use Google's dictionary box</span><span class="hint">Adds &amp;tbs=1 to definition searches, which brings back Google's Oxford Languages box and removes the AI Overview. If Google has no box for a word, the search reloads with the AI Overview instead, and this extension's box is used only if there's no AI Overview either.</span>
-  </label>
-
   <label class="row tip" id="bareRow"><input type="checkbox" id="bareWords">
     <span>Also on plain one-word searches</span><span class="hint">Searching just “serendipity” brings up Google's dictionary box too, no “meaning” needed. Only for words in the built-in English word list, and only when Google has a box for it.</span>
-  </label>
-
-  <label class="row tip"><input type="checkbox" id="hideAiOverview">
-    <span>Hide the AI Overview</span><span class="hint">Only on definition searches. Also hides the “AI Mode” tab link there.</span>
   </label>
 
   <div class="field">

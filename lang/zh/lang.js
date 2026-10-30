@@ -1,5 +1,5 @@
-// Chinese: "偶然的意思", "偶然是什么意思", "偶然 意思", "偶然的定义". Card definitions from 萌典
-// (lookup.js). Fields are described in lang/en/lang.js.
+// Chinese: "偶然的意思", "偶然是什么意思", "偶然 意思", "偶然的定义". Fields are described in
+// lang/en/lang.js.
 "use strict";
 
 LANGS.push(
@@ -30,21 +30,10 @@ LANGS.push(
     return {
       id: "zh",
       name: "中文 (Chinese)",
-      hint: "“偶然的意思”, “偶然是什么意思”, “偶然 意思”, “偶然的定义”. If Google has no box, the AI Overview shows instead; this extension's box (definitions from 萌典, moedict.tw) is used only if there's no AI Overview either.",
+      hint: "“偶然的意思”, “偶然是什么意思”, “偶然 意思”, “偶然的定义”. If Google has no box for the word, the AI Overview shows instead.",
       match,
       // No word list: the phrasing (1–8 Han characters + 意思 etc.) is enough.
       isReal: () => true,
-      card: {
-        label: "词典", search: "查词", lookingUp: (w) => `正在查询“${w}”…`,
-        listen: "朗读", similar: "近义词：", opposite: "反义词：", origin: "词源 ",
-        more: "更多释义", fewer: "收起", searchAs: (w) => `${w}的意思`, speech: "zh-CN",
-        notFound: (w) => `萌典里没有“${w}”。`,
-        failed: (why) => `释义加载失败（${why}）。`,
-        elsewhere: (w) => ({ href: `https://www.moedict.tw/${encodeURIComponent(w)}`, text: "去萌典查 ↗" }),
-        credit: (data, link) => [
-          h("span", null, "释义来自 ", link(data.sourceUrl || "https://www.moedict.tw/", "萌典"), "（教育部《重編國語辭典》）"),
-        ],
-      },
     };
   })()
 );

@@ -39,8 +39,6 @@ const langBoxes = () => [...document.querySelectorAll("#langs input")];
 
 function fill(s) {
   $("enabled").checked = !!s.enabled;
-  $("hideAiOverview").checked = !!s.hideAiOverview;
-  $("useGoogleBox").checked = !!s.useGoogleBox;
   $("bareWords").checked = !!s.bareWords;
   for (const box of langBoxes()) box.checked = !(s.disabledLangs || []).includes(box.dataset.lang);
   $("triggers").value = (s.triggers || []).join(", ");
@@ -64,8 +62,6 @@ $("save").addEventListener("click", () => {
   chrome.storage.sync.set(
     {
       enabled: $("enabled").checked,
-      hideAiOverview: $("hideAiOverview").checked,
-      useGoogleBox: $("useGoogleBox").checked,
       bareWords: $("bareWords").checked,
       disabledLangs: langBoxes().filter((b) => !b.checked).map((b) => b.dataset.lang),
       triggers: triggers.length ? triggers : DEFAULTS.triggers,

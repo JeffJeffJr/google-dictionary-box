@@ -5,8 +5,6 @@
 
 const DEFAULTS = {
   enabled: true,
-  hideAiOverview: true,
-  useGoogleBox: true,
   bareWords: true,
   disabledLangs: [], // language ids switched off in settings, e.g. ["zh"]
   triggers: ["define", "definition", "definitions", "meaning", "meanings", "dictionary", "def"],
@@ -64,8 +62,7 @@ function parseQuery(q, triggers = DEFAULTS.triggers) {
 }
 
 // A plain one-word search like "serendipity" (setting bareWords; languages opt in with `bare`).
-// Google decides whether its box shows for it; we only add tbs=1, and never show our own card
-// ("pizza" shouldn't get one).
+// Google decides whether its box shows for it ("pizza" gets none, and its normal page comes back).
 function bareWord(q) {
   const w = cleanWord(q);
   return w && /^\p{L}[\p{L}'’-]*$/u.test(w) ? w : null;

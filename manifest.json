@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Dictionary Box for Google",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Brings back Google's dictionary box, instead of the AI Overview, when you search for what a word means.",
   "permissions": [
     "storage",
@@ -20,9 +20,7 @@
     "https://www.google.com.ph/*",
     "https://www.google.co.id/*",
     "https://www.google.com.hk/*",
-    "https://www.google.com.tw/*",
-    "https://api.dictionaryapi.dev/*",
-    "https://www.moedict.tw/*"
+    "https://www.google.com.tw/*"
   ],
   "background": {
     "service_worker": "background.js"

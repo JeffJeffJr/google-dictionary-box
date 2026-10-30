@@ -1,12 +1,11 @@
 // English: "serendipity meaning", "define serendipity", plain "serendipity", checked against the
-// bundled word list (wordfilter.js, built from words.txt). Card definitions: lookup.js.
+// bundled word list (wordfilter.js, built from words.txt).
 //
 // A language entry has:
 //   id, name, hint   for settings ("English", and a line describing what it matches)
 //   match(q, settings) -> word or null    a definition search in this language
 //   bare(q) -> word or null               optional: a plain one-word search (setting bareWords)
 //   isReal(word) -> bool                  the word gate; nothing happens for words that fail it
-//   card                                  the fallback card's wording (see card.js)
 // Wrapped in a function so helper names don't clash with other content scripts.
 "use strict";
 
@@ -60,18 +59,6 @@ LANGS.push(
       match: (q, settings) => latin(parseQuery(q, settings.triggers)),
       bare: (q) => latin(bareWord(q)),
       isReal: isRealPhrase,
-      card: {
-        label: "Dictionary", search: "Search for a word", lookingUp: (w) => `Looking up “${w}”…`,
-        listen: "Listen", similar: "Similar:", opposite: "Opposite:", origin: "Origin ",
-        more: "More definitions", fewer: "Fewer definitions", searchAs: (w) => `${w} meaning`, speech: "en-US",
-        notFound: (w) => `No dictionary entry found for “${w}”.`,
-        failed: (why) => `Couldn't load the definition (${why}).`,
-        elsewhere: (w) => ({ href: `https://en.wiktionary.org/wiki/${encodeURIComponent(w)}`, text: "Try Wiktionary ↗" }),
-        credit: (data, link) => [
-          h("span", null, "Definitions from ", link(data.sourceUrl || "https://en.wiktionary.org/", "Wiktionary"), " via Free Dictionary API"),
-          link(`https://books.google.com/ngrams/graph?content=${encodeURIComponent(data.word)}&year_start=1800&corpus=en`, "Use over time ↗"),
-        ],
-      },
     };
   })()
 );

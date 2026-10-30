@@ -1,5 +1,6 @@
-// Dictionary Box for Google — content script entry point (loaded last; see manifest.json).
-// Decides what to do with each search: redirect to Google's box, show our card, or nothing.
+// Dictionary Box for Google — content script entry point (loaded last; registered by background.js).
+// Decides what to do with each search: switch to Google's box version (&tbs=1), back to the normal
+// search when Google has no box (so the AI Overview explains the word), or nothing.
 "use strict";
 
 // ---------- State ----------
@@ -42,24 +43,9 @@ function rememberNoBox(match) {
   } catch {}
 }
 
-// ---------- Data ----------
-
-function lookup(word, lang) {
-  return new Promise((resolve) => {
-    try {
-      chrome.runtime.sendMessage({ type: "gdb-lookup", word, lang }, (res) => {
-        if (chrome.runtime.lastError) resolve({ error: chrome.runtime.lastError.message });
-        else resolve(res || { error: "No response" });
-      });
-    } catch (e) {
-      resolve({ error: String(e) });
-    }
-  });
-}
-
 // The tbs=1 URL for a Google search URL we act on (a real word, not known to lack a box), else null.
 function boxUrlFor(href) {
-  if (!settings.enabled || !settings.useGoogleBox) return null;
+  if (!settings.enabled) return null;
   let url;
   try {
     url = new URL(href, location.href);
@@ -152,10 +138,6 @@ async function run() {
   if (q === lastQuery) return;
   lastQuery = q;
 
-  const old = document.getElementById("gdb-dictionary-box");
-  if (old) old.remove();
-  showAiParts();
-
   // Only on the main "All" results tab, or AI Mode (udm=50), which gets switched to normal results.
   const params = new URLSearchParams(location.search);
   const udm = params.get("udm");
@@ -164,83 +146,32 @@ async function run() {
   await ready;
   if (!settings.enabled) return;
 
+  // Only real words (English: the bundled word list). The check is instant, so a redirect happens
+  // at document_start before Google's page draws.
   const match = matchQuery(params, settings);
-  if (!match) return;
-  const { word, bare, lang } = match;
+  if (!match || !isRealMatch(match)) return;
 
-  // A word Google had no box for earlier: stay on the AI Overview version of the search.
-  const noBox = settings.useGoogleBox && hadNoBox(match);
-  const target = settings.useGoogleBox && !noBox ? googleBoxUrl(location.href) : null;
-  if ((udm === "50" || bare) && !target && params.get("tbs") !== "1") return;
-
-  // Only real words (bundled word list) get &tbs=1 or a card. The check is instant, so a redirect
-  // happens at document_start before Google's page draws.
-  const real = isRealMatch(match);
-  if (real && target && mayRedirect(q)) {
+  // Switch to Google's box version, unless Google had no box for this word before.
+  const target = hadNoBox(match) ? null : googleBoxUrl(location.href);
+  if (target && mayRedirect(q)) {
     location.replace(target);
     return;
   }
-  if (!real || udm === "50") return;
+  if (params.get("tbs") !== "1") return;
 
-  // On our tbs=1 page, keep it hidden until we know whether Google's box is there, so a
-  // switch to the AI Overview version doesn't flash a page with neither.
-  const checkBox = settings.useGoogleBox && params.get("tbs") === "1";
-  const release = checkBox ? holdPage() : () => {};
-
-  // Plain words never get our card or AI hiding: only Google's box, or Google's normal page.
-  const hideAi = settings.hideAiOverview && !noBox && !bare;
-  if (hideAi) hideAiParts();
-
+  // On the box version: keep the page hidden until we know whether Google's box is there. If it
+  // isn't, switch to the same search without tbs=1 so the AI Overview explains the word, and
+  // remember the word so later searches for it go straight there.
+  const release = holdPage();
   if (document.readyState === "loading") {
     await new Promise((r) => document.addEventListener("DOMContentLoaded", r, { once: true }));
   }
-
-  if (settings.useGoogleBox && !hasGoogleBox()) {
-    // No Google box: switch to the same search without tbs=1 so the AI Overview explains the word.
-    if (checkBox) {
-      rememberNoBox(match);
-      location.replace(withoutTbs(location.href));
-      return;
-    }
-    // Already on the AI Overview version: our card only shows if Google has no AI Overview either.
-    if (noBox && (await waitFor(hasAiOverview, 3000))) return;
+  if (!hasGoogleBox()) {
+    rememberNoBox(match);
+    location.replace(withoutTbs(location.href));
+    return;
   }
   release();
-  if (bare) return;
-
-  if (hideAi) {
-    markAiModeLinks();
-    const linkObs = new MutationObserver(markAiModeLinks);
-    linkObs.observe(document.body, { childList: true, subtree: true });
-    setTimeout(() => linkObs.disconnect(), 15000);
-  }
-
-  const anchor = await waitFor(findAnchor);
-  if (!anchor) return;
-  if (settings.useGoogleBox && hasGoogleBox()) return;
-
-  const { host, content } = buildShell(word, lang);
-  anchor.parent.insertBefore(host, anchor.before);
-
-  const obs = new MutationObserver(() => {
-    if (settings.useGoogleBox && hasGoogleBox()) {
-      host.remove();
-      obs.disconnect();
-    } else if (hideAi) {
-      hideAiOverviews(host);
-    }
-  });
-  if (hideAi) hideAiOverviews(host);
-  // Google's box and AI Overviews can stream in late — keep checking for a little while.
-  obs.observe(document.body, { childList: true, subtree: true });
-  setTimeout(() => obs.disconnect(), 15000);
-
-  const res = await lookup(word, lang.id);
-  if (res.entries && res.entries.length) {
-    renderDefinition(content, mergeEntries(res.entries, word));
-  } else {
-    renderMessage(content, word, res.notFound ? lang.card.notFound(word) : lang.card.failed(res.error || "unknown error"));
-  }
 }
 
 run();
